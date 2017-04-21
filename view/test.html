@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<script type="text/javascript" src="../js/jquery-3.1.1.js" ></script>
+	<script>
+		$(function(){
+			$.ajax({
+				type:"get",
+				url:"http://localhost/carSharing_monitor/api/getHtml?url=https://rarbg.to/top100.php?category[]=44",
+				async:true,
+				dataType:'jsonp',
+				jsonp:'jsonpCallback',
+				success:function(data){
+//					console.log(data);
+					var table = $(data.data).find('#top100_filter_form').closest('table');
+					var td = table.find('tr td');
+					var imgs = td.find('a[onmouseover]');
+					console.log(imgs)
+					for(var img of imgs ){
+						console.log($(img).attr("onmouseover"));
+						var imgStr = $(img).attr("onmouseover");
+						var start = imgStr.indexOf('//dyncdn.me');
+						var end = imgStr.indexOf('.jpg')+4;
+						var imgSrc = imgStr.substring(start,end); 
+						var imgTitle = $(img).attr("title");
+						console.log(imgSrc);
+						console.log($(img).attr("title"))
+						
+					}
+					$('body').append(table)
+					console.log(table)
+				}
+			});
+		})
+	</script>
+	<body>
+	</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>Hello MUI</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<!--App自定义的css-->
+		<link rel="stylesheet" type="text/css" href="../css/app.css"/>
+		<style>
+			.title {
+				margin: 20px 15px 10px;
+				color: #6d6d72;
+				font-size: 15px;
+			}
+		</style>
+	</head>
+
+	<body >
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">media list（图文列表）</h1>
+		</header>
+		<div class="mui-content" id="vue">
+			
+			<div class="title">
+				rarbg.to
+			</div>
+			<ul class="mui-table-view">
+				<li v-for="item in movies" class="mui-table-view-cell mui-media">
+					<a href="#">
+						<img :src="item.img" class=" mui-pull-left"  style="width:60px">
+						<div class="mui-media-body" style="padding:12px;">
+							 {{ item.title }}  
+							 <p class='mui-ellipsis'>{{item.size}}</p>
+							<p class='mui-ellipsis'> {{item.href}}</p>
+						</div>
+					</a>
+				</li>
+
+			</ul>
+			
+			</div>
+		</div>
+
+	</body>
+	<script src="../js/jquery-3.1.1.js"></script>
+	<script src="../js/mui.min.js"></script>
+	<script src="../js/vue.js"></script>
+	<script>
+	Array.prototype.contains = function (obj) {  
+    var i = this.length;  
+    while (i--) {  
+        if (this[i] === obj) {  
+            return true;  
+        }  
+    }  
+    return false;  
+}  		
+		getData()
+		var vm = new Vue({
+			  el: '#vue',
+			  data: {
+			  	movies:[]
+			  }
+			})
+		function getData(){
+			console.log("get")
+			$.ajax({
+				type:"get",
+				url:"http://localhost/carSharing_monitor/api/getHtml?url=https://rarbg.to/top100.php?category[]=44",
+				async:true,
+				dataType:'jsonp',
+				jsonp:'jsonpCallback',
+				success:function(data){
+					var table = $(data.data).find('#top100_filter_form').closest('table');
+					var td = table.find('tr td');
+					var imgs = td.find('a[onmouseover]');
+					var movies = [];
+					var array = [];
+					for(var i=0 ;i<imgs.length;i++ ){
+						
+						if(i>20)continue;
+						var movie = {};
+						var img = imgs[i];
+						var imgStr = $(img).attr("onmouseover");
+						var start = imgStr.indexOf('//dyncdn.me');
+						var end = imgStr.indexOf('.jpg')+4;
+						var imgSrc = imgStr.substring(start,end); 
+						var imgTitle = $(img).attr("title");
+						 var tr = $(img).closest('tr');
+						 var size = tr.find('td').eq(3).text();
+						var href = $(img).attr('href');						 
+						if(array.contains(imgSrc)) continue;
+						
+						movie.img = imgSrc;
+						movie.title = imgTitle;
+						movie.size = size;
+						movie.href = href;
+						movies.push(movie)
+						array.push(imgSrc)
+						
+					}
+					vm.movies = movies;
+				}
+			});		
+		}
+
+//		mui.init({
+//			swipeBack:true //启用右滑关闭功能
+//		});
+	</script>
+</html>
